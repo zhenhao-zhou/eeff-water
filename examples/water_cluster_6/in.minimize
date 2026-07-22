@@ -1,0 +1,50 @@
+# Six-water-cluster electronic minimization example
+# Nuclear positions are fixed while electron centers/radii are minimized.
+
+variable sname index perturbed_6_1
+log log.${sname}
+
+units real
+newton on
+boundary f f f
+atom_style hybrid electron bond
+bond_style harmonic
+
+read_data data.${sname}
+include ../../parameters/eeff_water_pair_style.inc
+
+bond_coeff 1 10000.0 1.0 -0.1
+special_bonds lj/coul 1.0 1.0 1.0
+comm_modify vel yes
+
+compute effTemp all temp/eff
+compute energies all pair eff/cut
+variable eke equal c_energies[1]
+variable epauli equal c_energies[2]
+variable ecoul equal c_energies[3]
+variable erres equal c_energies[4]
+variable eadd equal c_energies[5]
+
+thermo 1
+thermo_style custom step etotal ebond pe ke v_eke v_epauli v_ecoul v_erres v_eadd
+
+# Freeze O and H nuclei; minimize only the explicit electronic degrees of freedom.
+group nuclei type 1 2
+fix freeze_nuclei nuclei setforce 0.0 0.0 0.0
+
+compute electronic_state all property/atom spin eradius erforce
+dump min_dump all custom 100 ${sname}.min.lammpstrj id type q &
+    c_electronic_state[1] c_electronic_state[2] x y z fx fy fz c_electronic_state[3]
+
+min_style cg
+min_modify line backtrack
+min_modify dmax 0.01
+minimize 0.0 1.0 500 200000
+
+min_style sd
+min_modify line backtrack
+min_modify dmax 0.01
+minimize 0.0 1.0 500 200000
+
+unfix freeze_nuclei
+run 0

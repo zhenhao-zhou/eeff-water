@@ -1,0 +1,18 @@
+file	classification	install_location
+bond_harmonic.cpp	Modified LAMMPS MOLECULE package file	lammps/src/bond_harmonic.cpp
+bond_harmonic.h	Modified LAMMPS MOLECULE package header	lammps/src/bond_harmonic.h
+compute_temp.cpp	Modified LAMMPS core file	lammps/src/compute_temp.cpp
+compute_temp_eff.cpp	Modified LAMMPS EFF package file	lammps/src/compute_temp_eff.cpp
+compute_temp_rad.cpp	New custom compute for electron-radius temperature	lammps/src/compute_temp_rad.cpp
+compute_temp_rad.h	New custom compute header	lammps/src/compute_temp_rad.h
+fix_nh.cpp	Modified LAMMPS core file	lammps/src/fix_nh.cpp
+fix_nh_eff.cpp	Modified LAMMPS EFF package file	lammps/src/fix_nh_eff.cpp
+fix_rnh_eff.cpp	New custom radius-aware Nose-Hoover base implementation	lammps/src/fix_rnh_eff.cpp
+fix_rnh_eff.h	New custom radius-aware Nose-Hoover header	lammps/src/fix_rnh_eff.h
+fix_rnvt_eff.cpp	New custom radius-aware NVT fix	lammps/src/fix_rnvt_eff.cpp
+fix_rnvt_eff.h	New custom radius-aware NVT fix header	lammps/src/fix_rnvt_eff.h
+min_cg.cpp	Modified LAMMPS core minimizer file	lammps/src/min_cg.cpp
+min_linesearch.cpp	Modified LAMMPS core minimizer file	lammps/src/min_linesearch.cpp
+pair_eff_cut.cpp	Modified LAMMPS EFF package file; main pair-style implementation	lammps/src/pair_eff_cut.cpp
+pair_eff_cut.h	Modified LAMMPS EFF package header	lammps/src/pair_eff_cut.h
+pair_eff_inline.h	Modified LAMMPS EFF package inline potential functions	lammps/src/pair_eff_inline.h

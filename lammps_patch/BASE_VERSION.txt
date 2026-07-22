@@ -1,0 +1,28 @@
+LAMMPS base version
+===================
+
+Version reported by both supplied logs:
+    LAMMPS (2 Aug 2023 - Update 3)
+
+Exact Git commit:
+    Not yet identified.
+
+Build system:
+    Legacy make workflow was used in the original work.
+
+Minimum packages for the included run-0 examples:
+    EFF
+    MOLECULE
+
+Additional package used by the supplied bcc production input:
+    EXTRA-FIX  (for fix temp/csvr)
+
+Packages enabled in the original paper build according to package-status:
+    EFF, EXTRA-DUMP, EXTRA-FIX, KSPACE, MANYBODY, MOLECULE,
+    REAXFF, RIGID
+
+TODO before a stable paper release:
+    1. Identify the exact upstream Git commit corresponding to the
+       2 Aug 2023 - Update 3 release.
+    2. Record compiler, MPI implementation, machine makefile and flags.
+    3. Generate and test eeff_water.patch against a clean upstream tree.

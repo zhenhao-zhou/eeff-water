@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this code or data, please cite the associated manuscript."
+title: "EeFF-water supplementary code and data"
+authors:
+  - family-names: "Zhou"
+    given-names: "Zhenhao"
+# Add all manuscript authors before release.
+version: "0.1.0"
+date-released: "YYYY-MM-DD"
+repository-code: "https://github.com/<USER_OR_ORG>/<REPOSITORY_NAME>"
+# doi: "10.xxxx/xxxxx"

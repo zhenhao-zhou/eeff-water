@@ -1,0 +1,73 @@
+variable   sname index 511h2o_1h3o/511h2o_1oh
+
+units 		real
+newton		on
+boundary        p p p
+atom_style   hybrid electron bond
+bond_style   harmonic
+
+read_data  	data.${sname}
+
+pair_style      eff/cut 8.0 36.067922929754 6.015768135958 6.033262097851 1.006605738645 1.005525584469 0.653009191453 5.473842140705 1.806671846062 0.244166233105 4.423427127383 2.123578881855 0.440269738208 3.464002733606 2.264284887345 2.894074361762 0.745421211233 0.029027028805 0.252008584712 0.793165134230 0.940975268902 0.816113613427 2.227693842236 2.103939021459 5.053394543603 6.218097780497 0.333252502185 0.588291449554 0.462449510358 0.388317833138 0.668438858335 0.308320770063 1.807850122726 4.657324593281 6.124651150575 0.206530759214 1.282194520834 0.720743729857 0.787899870248 0.811469297120 1.544767804506 0.705525470862 1.962409030927 4.079863284305 5.915944566518 1.209009659618 1.218473580896 0.194947051245 1.282361542764 3.250309186103 1.206423797581 0.167037615672 5.318778377471 0.637623660240 31.964678871255 0.933901288659 0.340662334454 0.942567814719 0.328938193910
+
+pair_coeff	* *
+bond_coeff	1 10000.0 1.0 -0.1
+special_bonds lj/coul 1.0 1.0 1.0
+
+comm_modify	vel yes	
+
+compute         effTemp all temp/eff
+group		OH type 1 2
+group		e type 3
+compute	 temp_OH OH temp
+compute	temp_e e temp
+# 你定义的“绝热控压”压力
+compute p_nuc_only all pressure temp_OH
+
+compute         energies all pair eff/cut
+variable        eke equal c_energies[1]
+variable        epauli equal c_energies[2]
+variable        ecoul equal c_energies[3]
+variable        erres equal c_energies[4]
+variable        eadd equal c_energies[5]
+
+thermo          100
+thermo_style    custom step density c_temp_OH c_temp_e etotal ebond pe ke v_eke v_epauli v_ecoul v_erres v_eadd
+dump            3 OH custom 200 ${sname}.reaxc id type x y z
+dump            4 OH custom 200 ${sname}.unwrap.lammpstrj id type xu yu zu
+compute         1 all property/atom spin eradius erforce
+min_style	cg
+min_modify	line backtrack
+min_modify	dmax 0.01
+minimize	0 1 200 100000
+min_style	sd
+minimize	0 1 100 200000
+timestep 0.2
+neigh_modify 	one 100000
+neigh_modify 	page 1000000
+velocity all create 100 1001 mom yes rot yes dist gaussian
+
+
+fix 		1 OH nvt temp 100.0 100.0 100
+fix 		2 e nvt temp 50.0 50.0 100
+fix		3 e rnvt/eff temp 1.0 1.0 1
+fix		5 all momentum 100 linear 1 1 1 rescale angular
+run	        1000
+#write_data     data.${sname}
+unfix	1
+unfix	2
+
+fix             thermo_OH OH temp/csvr 300.0 300.0 10.0 54321
+fix_modify      thermo_OH temp temp_OH
+
+fix             thermo_e e temp/csvr 300.0 300.0 100.0 98765
+fix_modify      thermo_e temp temp_e
+
+fix             1 all nph iso 1.0 1.0 5000.0
+# 关键：让控压算法只看核动能+总维里
+fix_modify 1 press p_nuc_only
+
+run	        5000000
+
+dump_modify 3 sort id
+#write_data     data.${sname}

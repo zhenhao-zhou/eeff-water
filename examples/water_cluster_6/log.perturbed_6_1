@@ -1,0 +1,295 @@
+LAMMPS (2 Aug 2023 - Update 3)
+variable   sname index perturbed_6_1
+
+units 		real
+newton		on
+boundary        f f f
+atom_style   hybrid electron bond
+bond_style   harmonic
+
+read_data  	data.${sname}
+read_data  	data.perturbed_6_1
+Reading data file ...
+  orthogonal box = (-500 -500 -500) to (500 500 500)
+  1 by 1 by 1 MPI processor grid
+WARNING: Atom style in data file custom: idx type x y z q spin radius molecule differs from currently defined atom style hybrid (../read_data.cpp:621)
+  reading atoms ...
+  42 atoms
+  scanning bonds ...
+  4 = max bonds/atom
+  reading bonds ...
+  24 bonds
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0       
+  special bond factors coul:  0        0        0       
+     4 = max # of 1-2 neighbors
+     3 = max # of 1-3 neighbors
+     3 = max # of 1-4 neighbors
+     4 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  read_data CPU = 0.001 seconds
+
+pair_style      eff/cut 8.0 36.09828259206111 6.030813430908873 6.031955437642548 0.6142630312132321 5.0837125375529695 1.8404126694489356 0.22378068286931418 4.04086421828802 2.041960928885384 0.4462289486006732 3.3919862636287434 2.058756617083147 2.6198576876402293 0.7986379862250067 0.009513150007766156 0.2383900292569089 0.7576299304503276 0.8949748975190417 0.6767052775259601 1.9790039891072673 0.41432539290096226 0.5066672368451659 0.5197628849280039 0.388389513986399 0.6205374392495766 0.3223698294891593 0.18949245621318125 1.1326737367457707 0.7108763445713114 0.8161195029878838 0.7987290471567133 1.6010684022603034 0.6446513957282217 1.2636815640791725 1.0587941216102745 0.18786816897575065 1.2181412609564255 3.4992150739737498 1.2838857722423402 0.1657110745713663 5.593087066582186 0.6533503032834793 32.638826168931594 0.8678400532637572 0.3475058226235386 0.8588446342807762 0.32595291867026127
+
+pair_coeff	* *
+bond_coeff	1 10000.0 1.0 -0.1
+
+special_bonds lj/coul 1.0 1.0 1.0
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    1        1        1       
+  special bond factors coul:  1        1        1       
+     4 = max # of 1-2 neighbors
+     4 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+
+comm_modify	vel yes
+
+compute         effTemp all temp/eff
+
+compute         energies all pair eff/cut
+variable        eke equal c_energies[1]
+variable        epauli equal c_energies[2]
+variable        ecoul equal c_energies[3]
+variable        erres equal c_energies[4]
+variable        eadd equal c_energies[5]
+
+thermo          1
+thermo_style    custom step etotal ebond pe ke v_eke v_epauli v_ecoul v_erres v_eadd
+
+group		CH4 type 1 2
+18 atoms in group CH4
+fix		1 CH4 setforce 0.0 0.0 0.0
+
+min_style	cg
+min_modify	line backtrack
+min_modify	dmax 0.01
+compute         1 all property/atom spin eradius erforce
+dump            3 all custom 100 ${sname}.min.lammpstrj id type q c_1[1] c_1[2] x y z fx fy fz c_1[3]
+dump            3 all custom 100 perturbed_6_1.min.lammpstrj id type q c_1[1] c_1[2] x y z fx fy fz c_1[3]
+minimize	0 1 500 200000
+
+CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE
+
+Your simulation uses code contributions which should be cited:
+
+- EFF package: doi:10.1002/jcc.21637
+
+@Article{Jaramillo-Botero11,
+ author = {A. Jaramillo-Botero and J. Su and A. Qi and Goddard, III, W. A.},
+ title = {Large-Scale, Long-Term Nonadiabatic Electron Molecular Dynamics for Describing Material Properties and Phenomena in Extreme Environments},
+ journal = {J.~Comp.\ Chem.},
+ year =    2011,
+ volume =  32,
+ number =  3,
+ pages =   {497--512}
+}
+
+CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE
+
+Generated 0 of 3 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 200000, page size: 2000000
+  master list distance cutoff = 10
+  ghost atom cutoff = 10
+  binsize = 5, bins = 200 200 200
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair eff/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d
+      bin: standard
+dof_eff = 123.000000
+Per MPI rank memory allocation (min/avg/max) = 48.49 | 48.49 | 48.49 Mbytes
+   Step         TotEng         E_bond         PotEng         KinEng         v_eke         v_epauli       v_ecoul        v_erres         v_eadd    
+         0  -67903.233      0             -67903.233      0              22544.642      2242.3687     -92690.244      0              0            
+         1  -68914.847      0             -68914.847      0              23499.683      2277.0775     -94691.608      0              0            
+         2  -69696.319      0             -69696.319      0              25159.599      2350.8214     -97206.739      0              0            
+         3  -70144.064      0             -70144.064      0              26409.641      2447.806      -99001.511      0              0            
+         4  -70457.864      0             -70457.864      0              27513.824      2537.1249     -100508.81      0              0            
+         5  -70722.649      0             -70722.649      0              28903.937      2643.6078     -102270.19      0              0            
+         6  -70888.328      0             -70888.328      0              30205.883      2750.3492     -103844.56      0              0            
+         7  -70955.77       0             -70955.77       0              32395.571      2901.7843     -106253.13      0              0            
+         8  -70967.878      0             -70967.878      0              32702.28       2942.7897     -106612.95      0              0            
+         9  -70973.396      0             -70973.396      0              32224.552      2912.8099     -106110.76      0              0            
+        10  -70976.64       0             -70976.64       0              31960.283      2883.6812     -105820.6       0              0            
+        11  -70977.512      0             -70977.512      0              32086.67       2891.9301     -105956.11      0              0            
+        12  -70977.854      0             -70977.854      0              32115.734      2898.4738     -105992.06      0              0            
+        13  -70977.854      0             -70977.854      0              32117.584      2898.6331     -105994.07      0              0            
+        14  -70978.144      0             -70978.144      0              32198.893      2900.7963     -106077.83      0              0            
+        15  -70978.297      0             -70978.297      0              32181.275      2901.0432     -106060.62      0              0            
+        16  -70978.373      0             -70978.373      0              32225.265      2904.7949     -106108.43      0              0            
+        17  -70978.38       0             -70978.38       0              32234.425      2905.0702     -106117.88      0              0            
+        18  -70978.399      0             -70978.399      0              32243.796      2905.3093     -106127.5       0              0            
+        19  -70978.457      0             -70978.457      0              32229.119      2904.9901     -106112.57      0              0            
+        20  -70978.475      0             -70978.475      0              32212.634      2903.9881     -106095.1       0              0            
+        21  -70978.49       0             -70978.49       0              32203.128      2903.045      -106084.66      0              0            
+        22  -70978.499      0             -70978.499      0              32211.888      2903.3534     -106093.74      0              0            
+        23  -70978.505      0             -70978.505      0              32205.916      2903.4706     -106087.89      0              0            
+        24  -70978.516      0             -70978.516      0              32214.975      2903.668      -106097.16      0              0            
+        25  -70978.517      0             -70978.517      0              32216.782      2903.8262     -106099.13      0              0            
+        26  -70978.521      0             -70978.521      0              32212.892      2903.9473     -106095.36      0              0            
+        27  -70978.521      0             -70978.521      0              32213.251      2903.9949     -106095.77      0              0            
+        28  -70978.527      0             -70978.527      0              32219.063      2904.0874     -106101.68      0              0            
+        29  -70978.531      0             -70978.531      0              32218.521      2904.0822     -106101.13      0              0            
+        30  -70978.55       0             -70978.55       0              32210.567      2904.0228     -106093.14      0              0            
+        31  -70978.566      0             -70978.566      0              32222.338      2904.2625     -106105.17      0              0            
+        32  -70978.575      0             -70978.575      0              32219.075      2904.2946     -106101.94      0              0            
+        33  -70978.593      0             -70978.593      0              32230.401      2904.8015     -106113.8       0              0            
+        34  -70978.6        0             -70978.6        0              32227.826      2904.8566     -106111.28      0              0            
+        35  -70978.602      0             -70978.602      0              32222.06       2904.5567     -106105.22      0              0            
+        36  -70978.604      0             -70978.604      0              32215.079      2903.8197     -106097.5       0              0            
+        37  -70978.604      0             -70978.604      0              32212.297      2903.6374     -106094.54      0              0            
+        38  -70978.605      0             -70978.605      0              32213.685      2903.8568     -106096.15      0              0            
+        39  -70978.606      0             -70978.606      0              32222.025      2904.4517     -106105.08      0              0            
+        40  -70978.606      0             -70978.606      0              32222.447      2904.4463     -106105.5       0              0            
+        41  -70978.606      0             -70978.606      0              32218.791      2904.2303     -106101.63      0              0            
+        42  -70978.607      0             -70978.607      0              32215.648      2903.891      -106098.15      0              0            
+        43  -70978.607      0             -70978.607      0              32214.938      2903.8378     -106097.38      0              0            
+        44  -70978.607      0             -70978.607      0              32214.948      2903.9055     -106097.46      0              0            
+        45  -70978.607      0             -70978.607      0              32221.513      2904.3627     -106104.48      0              0            
+        46  -70978.607      0             -70978.607      0              32221.937      2904.4013     -106104.95      0              0            
+        47  -70978.607      0             -70978.607      0              32220.499      2904.3357     -106103.44      0              0            
+        48  -70978.608      0             -70978.608      0              32218.314      2904.1015     -106101.02      0              0            
+        49  -70978.608      0             -70978.608      0              32216.777      2903.9905     -106099.37      0              0            
+        50  -70978.608      0             -70978.608      0              32216.415      2904.0297     -106099.05      0              0            
+        51  -70978.608      0             -70978.608      0              32217.409      2904.1129     -106100.13      0              0            
+        52  -70978.608      0             -70978.608      0              32219.108      2904.1777     -106101.89      0              0            
+        53  -70978.608      0             -70978.608      0              32219.547      2904.2231     -106102.38      0              0            
+        54  -70978.608      0             -70978.608      0              32218.969      2904.2304     -106101.81      0              0            
+        55  -70978.608      0             -70978.608      0              32219.249      2904.2215     -106102.08      0              0            
+        56  -70978.609      0             -70978.609      0              32218.461      2904.1174     -106101.19      0              0            
+        57  -70978.609      0             -70978.609      0              32218.133      2904.092      -106100.83      0              0            
+        58  -70978.609      0             -70978.609      0              32217.351      2904.0824     -106100.04      0              0            
+        59  -70978.609      0             -70978.609      0              32217.958      2904.1085     -106100.68      0              0            
+        60  -70978.609      0             -70978.609      0              32219.842      2904.2593     -106102.71      0              0            
+        61  -70978.609      0             -70978.609      0              32220.557      2904.3444     -106103.51      0              0            
+        62  -70978.609      0             -70978.609      0              32221.164      2904.3357     -106104.11      0              0            
+        63  -70978.609      0             -70978.609      0              32219.682      2904.2232     -106102.51      0              0            
+        64  -70978.61       0             -70978.61       0              32218.29       2904.1783     -106101.08      0              0            
+        65  -70978.61       0             -70978.61       0              32218.417      2904.1676     -106101.19      0              0            
+        66  -70978.61       0             -70978.61       0              32218.558      2904.1662     -106101.33      0              0            
+Loop time of 0.117905 on 1 procs for 66 steps with 42 atoms
+
+96.9% CPU use with 1 MPI tasks x no OpenMP threads
+
+Minimization stats:
+  Stopping criterion = force tolerance
+  Energy initial, next-to-last, final = 
+     -67903.2333024712  -70978.6097425889  -70978.6097576769
+  Force two-norm initial, final = 19708.578 0.97698943
+  Force max component initial, final = 4484.5894 0.35363137
+  Final line search alpha, max atom move = 8.5814926e-06 3.034685e-06
+  Iterations, force evaluations = 66 450
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.11647    | 0.11647    | 0.11647    |   0.0 | 98.78
+Bond    | 0.00010155 | 0.00010155 | 0.00010155 |   0.0 |  0.09
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 3.187e-05  | 3.187e-05  | 3.187e-05  |   0.0 |  0.03
+Output  | 0.00081476 | 0.00081476 | 0.00081476 |   0.0 |  0.69
+Modify  | 5.7693e-05 | 5.7693e-05 | 5.7693e-05 |   0.0 |  0.05
+Other   |            | 0.00043    |            |       |  0.36
+
+Nlocal:             42 ave          42 max          42 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:              0 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:            861 ave         861 max         861 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 861
+Ave neighs/atom = 20.5
+Ave special neighs/atom = 1.1428571
+Neighbor list builds = 0
+Dangerous builds = 0
+min_style	sd
+min_modify	line backtrack
+min_modify	dmax 0.01
+minimize	0 1 500 200000
+Generated 0 of 3 mixed pair_coeff terms from geometric mixing rule
+dof_eff = 123.000000
+Per MPI rank memory allocation (min/avg/max) = 50.12 | 50.12 | 50.12 Mbytes
+   Step         TotEng         E_bond         PotEng         KinEng         v_eke         v_epauli       v_ecoul        v_erres         v_eadd    
+        66  -70978.61       0             -70978.61       0              32218.558      2904.1662     -106101.33      0              0            
+        67  -70978.61       0             -70978.61       0              32218.275      2904.159      -106101.04      0              0            
+        68  -70978.61       0             -70978.61       0              32218.452      2904.1596     -106101.22      0              0            
+Loop time of 0.00670442 on 1 procs for 2 steps with 42 atoms
+
+99.3% CPU use with 1 MPI tasks x no OpenMP threads
+
+Minimization stats:
+  Stopping criterion = force tolerance
+  Energy initial, next-to-last, final = 
+     -70978.6097576769  -70978.6097598593  -70978.6097643253
+  Force two-norm initial, final = 0.97698943 0.76618619
+  Force max component initial, final = 0.35363137 0.2483475
+  Final line search alpha, max atom move = 8.6000751e-06 2.1358072e-06
+  Iterations, force evaluations = 2 25
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.006563   | 0.006563   | 0.006563   |   0.0 | 97.89
+Bond    | 5.44e-06   | 5.44e-06   | 5.44e-06   |   0.0 |  0.08
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 1.923e-06  | 1.923e-06  | 1.923e-06  |   0.0 |  0.03
+Output  | 5.168e-06  | 5.168e-06  | 5.168e-06  |   0.0 |  0.08
+Modify  | 3.394e-06  | 3.394e-06  | 3.394e-06  |   0.0 |  0.05
+Other   |            | 0.0001255  |            |       |  1.87
+
+Nlocal:             42 ave          42 max          42 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:              0 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:            861 ave         861 max         861 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 861
+Ave neighs/atom = 20.5
+Ave special neighs/atom = 1.1428571
+Neighbor list builds = 0
+Dangerous builds = 0
+unfix		1
+timestep 0.01
+fix 		1 all nvt temp 3000.0 3000.0 1
+dump            2 CH4 custom 1 ${sname}.force.lammpstrj fx fy fz
+dump            2 CH4 custom 1 perturbed_6_1.force.lammpstrj fx fy fz
+dump_modify 2 sort id
+run		0
+Generated 0 of 3 mixed pair_coeff terms from geometric mixing rule
+dof_eff = 123.000000
+Per MPI rank memory allocation (min/avg/max) = 48.62 | 48.62 | 48.62 Mbytes
+   Step         TotEng         E_bond         PotEng         KinEng         v_eke         v_epauli       v_ecoul        v_erres         v_eadd    
+        68  -70978.61       0             -70978.61       0              32218.452      2904.1596     -106101.22      0              0            
+Loop time of 6.31e-07 on 1 procs for 0 steps with 42 atoms
+
+158.5% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0          | 0          | 0          |   0.0 |  0.00
+Bond    | 0          | 0          | 0          |   0.0 |  0.00
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0          | 0          | 0          |   0.0 |  0.00
+Output  | 0          | 0          | 0          |   0.0 |  0.00
+Modify  | 0          | 0          | 0          |   0.0 |  0.00
+Other   |            | 6.31e-07   |            |       |100.00
+
+Nlocal:             42 ave          42 max          42 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:              0 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:            861 ave         861 max         861 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 861
+Ave neighs/atom = 20.5
+Ave special neighs/atom = 1.1428571
+Neighbor list builds = 0
+Dangerous builds = 0
+#write_data     data.${sname}
+Total wall time: 0:00:00
