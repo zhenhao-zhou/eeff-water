@@ -30,7 +30,6 @@ The `examples/` directory should contain representative production inputs and in
 - ambient proton-defect water
 - compressed liquid water
 - superionic water
-- mixed close-packed oxygen-lattice water, if reported as a main benchmark
 
 Detailed notes on the minimum required case-study inputs are provided in `examples/REQUIRED_INPUTS.md`.
 
