@@ -1,9 +1,7 @@
-# Code availability
+﻿# Code and data availability
 
-The EeFF-water modified LAMMPS source files, final parameter files, figure source data, and representative input configuration files for the benchmark simulations are provided in the Supplementary Data files and are available at:
+The modified LAMMPS source files, final EeFF-water parameter set, parameterization dataset, numerical source data and representative simulation inputs associated with the manuscript are available in this repository:
 
-https://github.com/<USER_OR_ORG>/<REPOSITORY_NAME>
+https://github.com/zhenhao-zhou/eeff-water
 
-Details of the simulation protocols and analysis definitions are provided in the Methods and Supplementary Information.
-
-Before public release, replace the placeholder GitHub URL with the final repository URL and add the manuscript citation.
+Details of the model formulation, simulation protocols and analysis definitions are provided in the Methods and Supplementary Information.
