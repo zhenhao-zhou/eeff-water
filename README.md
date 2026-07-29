@@ -1,42 +1,58 @@
-# EeFF-water supplementary code and data
+﻿# EeFF-water: code, parameters and data
 
-This archive provides the modified LAMMPS source files, EeFF-water parameter information, figure source data, and representative simulation inputs associated with the manuscript.
+This repository provides the modified LAMMPS source files, final force-field parameters, parameterization dataset, numerical source data and representative simulation inputs associated with the EeFF water model.
 
-## Contents
+EeFF is an explicit-electron reactive force field in which effective oxygen cores, hydrogen nuclei and valence electron-pair wave packets are propagated as interacting particles.
 
-- `src/`: modified LAMMPS source files required for the EeFF-water simulations.
-- `lammps_patch/`: base LAMMPS version information and installation notes.
-- `parameters/`: final EeFF-water parameter file and parameter-order information.
-- `examples/`: representative LAMMPS input and configuration files for benchmark simulations.
-- `Source_Data/`: numerical source data used for figure generation.
+## Repository contents
+
+- `src/`: modified LAMMPS source files used for EeFF-water simulations.
+- `lammps_patch/`: base LAMMPS version information and compilation notes.
+- `parameters/`: final EeFF-water parameter set and parameter-order information.
+- `training_data/`: energy and force reference data used for parameterization.
+- `examples/`: representative LAMMPS inputs and initial configurations.
+- `Source_Data/`: numerical source data used to generate the manuscript and supplementary figures.
+
+## Parameterization dataset
+
+The parameterization dataset contains 1,772 configurations, including 1,762 isolated molecular and ionic cluster configurations and 10 condensed-phase configurations containing 64 water molecules.
+
+The dataset includes distorted water monomers, neutral water clusters, protonated and deprotonated water clusters, double-defect clusters and ambient liquid-water configurations.
+
+Cluster reference energies and nuclear forces were calculated at the M06-2X/def2-TZVP level. The condensed-phase configurations were selected from a published revPBE0-D3 liquid- and solid-water dataset.
+
+Energies were expressed relative to the lowest-energy configuration within each compositional class. Compressed and superionic water configurations were excluded from the parameterization dataset and were used to evaluate model transferability.
+
+Additional documentation is provided in `training_data/README.md`.
 
 ## Required software
 
-The simulations require a LAMMPS build containing the modified eFF source files in `src/`. The base LAMMPS version and build notes are provided in `lammps_patch/`.
+The simulations require a LAMMPS build containing the modified eFF source files provided in `src/`. Information on the base LAMMPS version and compilation procedure is provided in `lammps_patch/`.
 
-## Parameters
+## EeFF-water parameters
 
-The final EeFF-water parameter set should be provided in `parameters/` together with the parameter order and units used in the manuscript. Keep the atom-type convention consistent with the LAMMPS input files:
+The final EeFF-water parameter set is provided in `parameters/`.
 
-- O nuclei: type 1
-- H nuclei: type 2
+The atom-type convention used in the simulations is:
+
+- oxygen cores: type 1
+- hydrogen nuclei: type 2
 - electron pairs: type 3
-
-## Example simulations
-
-The `examples/` directory should contain representative production inputs and initial configurations for the main benchmark categories reported in the manuscript:
-
-- ambient liquid water
-- ambient proton-defect water
-- compressed liquid water
-- superionic water
-
-Detailed notes on the minimum required case-study inputs are provided in `examples/REQUIRED_INPUTS.md`.
 
 ## Source data
 
-The `Source_Data/` directory contains numerical data used to generate the manuscript and supplementary figures. Where full trajectories are too large to include, processed source data and representative input files are provided, and the complete large data should be deposited in a public archive.
+The `Source_Data/` directory contains numerical values used to generate the manuscript and supplementary figures.
+
+Processed source data are provided when complete molecular-dynamics trajectories are too large for inclusion in the repository.
 
 ## Citation
 
-If you use these files, please cite the associated manuscript. A machine-readable citation template is provided in `CITATION.cff` and should be updated after publication.
+Please cite the associated manuscript when using the EeFF-water source code, parameters or data:
+
+"A transferable explicit electron force field for molecular, ionic and superionic water"
+
+A machine-readable citation record is provided in `CITATION.cff` and will be updated with the final publication information.
+
+## License
+
+Licensing information for the modified LAMMPS source files, EeFF-water parameters, parameterization dataset and processed source data is provided in `LICENSE.md`.
