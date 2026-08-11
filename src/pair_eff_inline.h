@@ -26,7 +26,7 @@ namespace LAMMPS_NS {
 #define ERF_TERMS2 7
 #define DERF_TERMS 13
 
-// 样条系数
+// Spline coefficients.
 static constexpr double c_proton[6] = {0.5, 0.0, 0.0, 0.625, -0.46875, 0.09375};
 static constexpr double c_core1  [6] = {0.0, 0.0, 6.944444, 0.0, -19.290123, 12.860082};
 static constexpr double c_core2  [6] = {-8.487654, 49.897119, -100.222908,
@@ -42,7 +42,7 @@ inline double smootherstep_deriv(double u) {
     return (30*u*u*(u*(u - 2) + 1));
 }
 
-// zeta_H核（r0 = 0.37，区间 [0, 1.11]）
+// Proton zeta function (r0 = 0.37, interval [0, 1.11]).
 inline void zeta_proton(double r, double r0, double &z, double &dz) {
     const double r_min = 1e-10;
     const double r_peak = r0;
@@ -52,17 +52,17 @@ inline void zeta_proton(double r, double r0, double &z, double &dz) {
         z = 0.0;
         dz = 0.0;
     } else if (r <= r_peak) {
-        double u = r / r_peak;  // maps [0, r0] → [0, 1]
+        double u = r / r_peak;  // maps [0, r0] -> [0, 1]
         z = smootherstep(u);
         dz = smootherstep_deriv(u) / r_peak;
     } else {
-        double u = (r_max - r) / (r_max - r_peak);  // maps [r0, 3r0] → [1, 0]
+        double u = (r_max - r) / (r_max - r_peak);  // maps [r0, 3r0] -> [1, 0]
         z = smootherstep(u);
         dz = -smootherstep_deriv(u) / (r_max - r_peak);
     }
 }
 
-// zeta_O核（r0 = 0.63，区间 [0, 1.89]）
+// Oxygen-core zeta function (r0 = 0.63, interval [0, 1.89]).
 inline void zeta_core(double r, double r0, double &z, double &dz) {
     const double r_min = 1e-10;
     const double r_peak = r0;
@@ -82,7 +82,7 @@ inline void zeta_core(double r, double r0, double &z, double &dz) {
     }
 }
 
-//权重取决于共价半径与原子电负性
+// Weight depends on the covalent radius and electronegativity.
 inline void weight_function(double r, double r0, double chi_A, double &w, double &dw) {
     const double r_max = 3.0 * r0;
 
@@ -90,7 +90,7 @@ inline void weight_function(double r, double r0, double chi_A, double &w, double
         w = 0.0;
         dw = 0.0;
     } else {
-        double u = r / r_max;  // u ∈ [0, 1]
+        double u = r / r_max;  // u in [0, 1]
         double s = smootherstep(u);
         double dsdu = smootherstep_deriv(u);
         w = chi_A * (1.0 - s);
@@ -99,11 +99,11 @@ inline void weight_function(double r, double r0, double chi_A, double &w, double
 }
 
 inline int samespin(int i, int j) {
-    // 判断两个整数是否同号
+    // Return whether two spin integers have the same sign.
     if ((i > 0 && j > 0) || (i < 0 && j < 0)) {
-        return 1; // 同号
+        return 1; // same sign
     } else {
-        return 0; // 不同号
+        return 0; // opposite sign
     }
 }
 
@@ -136,10 +136,10 @@ void Unn(double r, double &e, double &f,
     double u = pow(r/rho,3);
     double D = 1.0 + tau*u + u*u;
 
-    // 能量
+    // Energy.
     e = q/r - kappa / D;
 
-    // 力
+    // Force.
     double f1 = q / (r*r);
 
     double dD = 3.0*(r*r)/(rho*rho*rho) * (tau + 2.0*u);
@@ -157,40 +157,40 @@ void Uoo(double r, double &e, double &f,
          double A_gauss, 
          double B_gauss)
 {
-    // --- 1. 长程静电 + 屏蔽项 (原始逻辑) ---
+    // 1. Long-range electrostatic and screening terms.
     double u = pow(r/rho, 3);
     double D = 1.0 + tau*u + u*u;
 
-    // 长程能量
+    // Long-range energy.
     e = q/r - kappa / D;
 
-    // 长程力
+    // Long-range force.
     double f1 = q / (r*r);
     double dD = 3.0*(r*r)/(rho*rho*rho) * (tau + 2.0*u);
     double f2 = - kappa * dD / (D*D);
 
     f = f1 + f2;
 
-    // --- 2. 短程指数平滑排斥 (Exponential Tapered Repulsion) ---
-    // 形式: E = A * exp(-B*r) * (1 - r/rc)^2
-    // 目的: 增强近距离排斥以防止高压下密度过大
+    // 2. Short-range exponentially tapered repulsion.
+    // Form: E = A * exp(-B*r) * (1 - r/rc)^2.
+    // Provides additional short-range repulsion under strong compression.
     
     if (r < rc_wall) {
-        // --- 中间变量计算 ---
+        // Intermediate quantities.
         double r_norm = r / rc_wall;          // r / rc
         double taper = 1.0 - r_norm;          // (1 - r/rc)
         double taper2 = taper * taper;        // (1 - r/rc)^2
         
-        // 指数衰减项: exp(-B*r)
+        // Exponential decay term: exp(-B*r).
         double expo = exp( -B_gauss * r ); 
 
-        // --- 能量修正 ---
+        // Energy correction.
         double e_rep = A_gauss * expo * taper2;
         e += e_rep;
 
-        // --- 力修正 ---
+        // Force correction.
         // F_rep = -dE/dr
-        // 推导: E' = A * [ -B*exp*taper^2 + exp*2*taper*(-1/rc) ]
+        // Derivative: E' = A * [-B*exp*taper^2 + exp*2*taper*(-1/rc)].
         //          = -A * exp * taper * [ B*taper + 2/rc ]
         // f_rep = -E' = A * exp * taper * [ B*taper + 2/rc ]
         
@@ -207,29 +207,29 @@ inline void KinElec(
     double r,
     double *eke,
     double *frc,
-    // 原 K
+    // Base K.
     double K,
-    // 新增修饰参数
-    double A,  // 短程强度
-    double B,  // 短程衰减 (r^2 前)
-    double C,  // 中程强度
-    double D   // 中程衰减 (r 前)
+    // Additional modulation parameters.
+    double A,  // short-range amplitude
+    double B,  // short-range decay multiplying r^2
+    double C,  // intermediate-range amplitude
+    double D   // intermediate-range decay multiplying r
 ) {
     double r2    = r * r;
     double inv_r2= 1.0 / r2;
     double inv_r3= inv_r2 / r;
 
-    // 修饰因子及其导数
+    // Modulation factor and derivative.
     double e1 = exp(-B * r2);
     double e2 = exp(-D * r);
     double M  = 1.0 + A * e1 + C * e2;
     double dM = -2.0 * A * B * r * e1
                 -   C * D      * e2;
 
-    // 势能
+    // Potential energy.
     *eke += 0.5 * K * (M * inv_r2);
 
-    // 力
+    // Force.
     // F = K*chi_f * [ 2*M/r^3 - (dM)/r^2 ]
     double F = 0.5 * K * (
                    2.0 * M * inv_r3
@@ -447,9 +447,9 @@ inline void Cee(double multi, double rc, double re1, double re2,
     dAdr0 += 8.0 * r0_7;
 
     /* ----- Part 1: derivatives of E1 = multi * A^{-1/8} / s ----- */
-    /* ∂E1/∂A = multi * (-1/8) * A^{-9/8} / s */
+    /* dE1/dA = multi * (-1/8) * A^{-9/8} / s */
     /* dr0/drc = 1/s */
-    /* => dE1/drc = ∂E1/∂A * dA/dr0 * dr0/drc
+    /* => dE1/drc = dE1/dA * dA/dr0 * dr0/drc
                  = -multi*(1/8) * A^{-9/8} * dAdr0 / (s * s) */
     double dE1_drc = - multi * (1.0 / 8.0) * A_inv_9_8 * dAdr0 / (s * s);
 
@@ -459,11 +459,11 @@ inline void Cee(double multi, double rc, double re1, double re2,
     double dr0_dre1 = - rc * dsdre1 / (s * s);
     double dr0_dre2 = - rc * dsdre2 / (s * s);
 
-    /* ∂E1/∂s = - multi * A^{-1/8} / s^2 */
+    /* dE1/ds = - multi * A^{-1/8} / s^2 */
     double dE1_ds = - multi * A_inv_1_8 / (s * s);
 
-    /* dE1/dre1 = ∂E1/∂A * dA/dr0 * dr0/dre1 + ∂E1/∂s * ds/dre1
-       note ∂E1/∂A = multi * (-1/8) * A^{-9/8} / s
+    /* dE1/dre1 = dE1/dA * dA/dr0 * dr0/dre1 + dE1/ds * ds/dre1
+       note dE1/dA = multi * (-1/8) * A^{-9/8} / s
     */
     double dE1_dre1 = - multi * (1.0 / 8.0) * A_inv_9_8 * dAdr0 * dr0_dre1 / s + dE1_ds * dsdre1;
     double dE1_dre2 = - multi * (1.0 / 8.0) * A_inv_9_8 * dAdr0 * dr0_dre2 / s + dE1_ds * dsdre2;
@@ -498,14 +498,14 @@ inline void Cee_0(double re1, double *ecoul, double *fre1, double ah, double a1,
     // a0 = sqrt(2)*re1 + ah
     double a0 = sqrt2 * re1 + ah;
 
-	// 累加能量
+	// Accumulate energy.
 	*ecoul += 1 / (a1*a0) + kvv;
 
 	// d(1/a0)/dre1 = -sqrt2 / a0^2
 	double dInvA0 = -sqrt2 / (a0 * a0);
 
-	// du/dre1 = 0 （u 为常数）
-	// 故 fre1 = prefac * (0 + u * dInvA0)
+	// du/dre1 = 0 because u is constant.
+	// Therefore fre1 = prefac * (0 + u * dInvA0).
 	*fre1 += - 1 / a1 * dInvA0;
 }
 

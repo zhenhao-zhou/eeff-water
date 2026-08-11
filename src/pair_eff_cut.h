@@ -46,11 +46,11 @@ class PairEffCut : public Pair {
 
  private:
   //double time1, time2, time3, time4;
-  // 用来存储每个电子的环境因子与梯度
+  // Per-electron environment factors and gradients.
   double *chi_ke;       // length = atom->nlocal+atom->nghost
   double **dchi_ke;     // [N][3]
   
-  // 本进程上所有 proton 和 core 的索引
+  // Local proton and core indices on this MPI rank.
   std::vector<int> proton_list;
   std::vector<int> core_list;
   std::vector<int> electron_list;

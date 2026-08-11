@@ -1,0 +1,66 @@
+# EeFF-water fcc superionic-water example at 100 GPa.
+# Representative production target: 1000 K nuclei and 500 K electron translation.
+
+variable sname index fcc_500h2o
+log log.${sname}
+
+units real
+newton on
+boundary p p p
+atom_style hybrid electron bond
+bond_style harmonic
+
+read_data data.${sname}
+include ../../parameters/eeff_water_pair_style.inc
+
+bond_coeff 1 10000.0 1.0 -0.1
+special_bonds lj/coul 1.0 1.0 1.0
+comm_modify vel yes
+
+group nuclei type 1 2
+group electrons type 3
+compute temp_nuclei nuclei temp
+compute temp_electrons electrons temp
+compute p_nuc_only all pressure temp_nuclei
+
+compute energies all pair eff/cut
+variable eke equal c_energies[1]
+variable epauli equal c_energies[2]
+variable ecoul equal c_energies[3]
+variable erres equal c_energies[4]
+variable eadd equal c_energies[5]
+
+thermo 100
+thermo_style custom step density c_temp_nuclei c_temp_electrons etotal ebond pe ke v_eke v_epauli v_ecoul v_erres v_eadd
+dump all_wrapped all custom 200 ${sname}.lammpstrj id type x y z
+dump nuclei_unwrapped nuclei custom 200 ${sname}.unwrap.lammpstrj id type xu yu zu
+dump_modify all_wrapped sort id
+dump_modify nuclei_unwrapped sort id
+compute electronic_state all property/atom spin eradius erforce
+
+timestep 0.1
+neigh_modify one 1000000
+neigh_modify page 10000000
+velocity all create 100 1202 mom yes rot yes dist gaussian
+
+fix radial_thermostat electrons rnvt/eff temp 1.0 1.0 1
+fix remove_momentum all momentum 100 linear 1 1 1 rescale angular
+
+# Ramp from 400 K to the representative 1000 K nuclear target over 0.6 ps.
+fix thermostat_nuclei nuclei temp/csvr 400.0 1000.0 10.0 67151
+fix_modify thermostat_nuclei temp temp_nuclei
+fix thermostat_electrons electrons temp/csvr 200.0 500.0 100.0 60848
+fix_modify thermostat_electrons temp temp_electrons
+fix barostat all nph iso 986900.0 986900.0 5000.0
+fix_modify barostat press p_nuc_only
+run 6000
+
+unfix thermostat_nuclei
+unfix thermostat_electrons
+
+# 20 ps representative production segment.
+fix thermostat_nuclei nuclei temp/csvr 1000.0 1000.0 10.0 67151
+fix_modify thermostat_nuclei temp temp_nuclei
+fix thermostat_electrons electrons temp/csvr 500.0 500.0 100.0 60848
+fix_modify thermostat_electrons temp temp_electrons
+run 200000

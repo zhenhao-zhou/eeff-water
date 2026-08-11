@@ -63,7 +63,7 @@ void FixNHEff::nve_v()
     if (mask[i] & groupbit) {
       if (abs(spin[i])>=1 && abs(spin[i])<=5) {
         dtfm = dtf / mass[type[i]];
-		//修改过
+		// Modified for the EeFF-water implementation.
 		ervel[i] *= 0.9;
         ervel[i] += dtfm * erforce[i] * 2;
       }

@@ -1,12 +1,59 @@
 # Building the EeFF-water LAMMPS executable
 
-This archive contains the modified LAMMPS source files required for the EeFF-water simulations. The base LAMMPS version is recorded in `BASE_VERSION.txt`.
+The supplied source modifications target LAMMPS 2 Aug 2023 - Update 3 and the legacy make build workflow.
 
-Recommended installation procedure:
+## 1. Obtain the base source
 
-1. Download the base LAMMPS version specified in `BASE_VERSION.txt`.
-2. Copy the files in `src/` from this archive into the corresponding LAMMPS `src/` directory, replacing the original files where names overlap.
-3. Build LAMMPS using the packages and compiler settings used in the manuscript.
-4. Verify the build using the smoke-test inputs in `examples/`.
+Obtain a clean copy of the official LAMMPS 2 Aug 2023 - Update 3 source release.
 
-The exact executable name, compiler version, MPI version and optional acceleration packages should be recorded here before public release.
+## 2. Copy the EeFF-water source files
+
+From the repository root, copy the files under `src/` into the base LAMMPS `src/` directory, replacing files with the same names:
+
+```bash
+cp src/* /path/to/lammps/src/
+```
+
+`src/MANIFEST.tsv` records whether each file is a modified upstream file or a new EeFF-water file.
+
+## 3. Enable required packages
+
+Using the legacy LAMMPS make workflow:
+
+```bash
+cd /path/to/lammps/src
+make yes-eff
+make yes-molecule
+make yes-extra-fix
+```
+
+The original production build also enabled EXTRA-DUMP, KSPACE, MANYBODY, REAXFF, and RIGID, but these packages are not required by every EeFF-water example.
+
+## 4. Compile
+
+Build with an MPI makefile appropriate for the local system, for example:
+
+```bash
+make -j 8 mpi
+```
+
+The archived production environment used GCC/G++ 8.5.0 and OpenMPI 4.1.6. Other compatible compilers and MPI implementations may also work but should be validated locally.
+
+## 5. Static repository validation
+
+Before running LAMMPS, validate the repository package:
+
+```bash
+python scripts/validate_repository.py
+```
+
+## 6. Minimal runtime test
+
+The smallest supplied test is the fixed-nuclei six-water-cluster minimization:
+
+```bash
+cd examples/water_cluster_6
+/path/to/lmp -in in.minimize
+```
+
+The other example inputs are production-scale demonstrations and can be computationally expensive.

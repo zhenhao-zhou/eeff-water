@@ -47,7 +47,7 @@ PairEffCut::PairEffCut(LAMMPS *lmp) : Pair(lmp)
   nmax = 0;
   min_eradius = nullptr;
   min_erforce = nullptr;
-  nextra = 5;//5个能量 + 4个时间
+  nextra = 5;// five energy components are exposed through pvector
   pvector = new double[nextra];
   //time1 = time2 = time3 = time4 = 0;
 }
@@ -75,7 +75,7 @@ void PairEffCut::compute(int eflag, int vflag)
   double xtmp,ytmp,ztmp,delx,dely,delz,energy;
   double eke,ecoul,epauli,eadd,errestrain,halfcoul,halfpauli;
   double fpair,fx,fy,fz,fadd;
-  //用于存储由于环境因子导致的额外受力
+  // additional force components used by the modified implementation
   double f1x,f1y,f1z,fh;
   double e1rforce,e2rforce,e1rvirial,e2rvirial;
   double s_fpair, s_e1rforce, s_e2rforce;
@@ -115,7 +115,7 @@ void PairEffCut::compute(int eflag, int vflag)
 
   // loop over neighbors of my atoms
   for (ii = 0; ii < inum; ii++) {
-    i = ilist[ii];//包含了所有的nlocal粒子
+    i = ilist[ii];// local particles from the neighbor list
 
 	//utils::logmesg(lmp,"i = {:d}\n",ilist[ii]);
     xtmp = x[i][0];
@@ -133,7 +133,7 @@ void PairEffCut::compute(int eflag, int vflag)
 
 	  //KinElec(eradius[i],&eke,&e1rforce,2*ke_e1);
 	  KinElec(eradius[i],&eke,&e1rforce,2*ke_e1,A_e1,B_e1,C_e1,D_e1);
-	  erforce[i] += e1rforce * hhmss2e;//注意单位转换
+	  erforce[i] += e1rforce * hhmss2e;// unit conversion
 	  e1rforce = 0.0;
 	  Cee_0(eradius[i],&ecoul,&e1rforce,ah_e11,a1_e11,kvv_e11);
       erforce[i] += e1rforce * qqrd2e;
@@ -216,7 +216,7 @@ void PairEffCut::compute(int eflag, int vflag)
 		  	Uoo(rc,ecoul,fpair,kappa_oo,tau_oo,rho_oo,qoo,rc_wall,A_gauss,B_gauss);
 			harmonic(rc, 1.8, 200.0, &eadd, &fadd);
 			}
-			SmallRForce(delx,dely,delz,rc,fadd,&fx,&fy,&fz);//??
+			SmallRForce(delx,dely,delz,rc,fadd,&fx,&fy,&fz);
 			f[i][0] += fx;
 			f[i][1] += fy;
 			f[i][2] += fz;
@@ -235,8 +235,8 @@ void PairEffCut::compute(int eflag, int vflag)
         }
 		
         // nucleus (i) - electron (j) Coul interaction
-		// 注意指数项最好比1大一些，否则会导致导数的突变
-		//核与外层电子
+		// Exponents are chosen to keep the derivatives smooth.
+		// nucleus-electron interaction
         else if  (q[i] != 0 && abs(spin[j]) == 1) {
           e1rforce = e2rforce = s_e1rforce = s_e2rforce = 0.0;
 		  if(abs(q[i])==1){
@@ -245,8 +245,8 @@ void PairEffCut::compute(int eflag, int vflag)
 		  else{
 		  	Uec(2.0,qoe,rc,eradius[j],&ecoul,&fpair,&e2rforce,ac_e1,ac1_e1,ac2_e1,ac3_e1,ac4_e1,poe1,ac22_e1,ac33_e1,ac44_e1);
 			/*
-			harmonic(rc, 0.4, 10000, &eadd, &fadd);//避免外层电子和O核重叠
-			SmallRForce(delx,dely,delz,rc,fadd,&fx,&fy,&fz);//??
+			harmonic(rc, 0.4, 10000, &eadd, &fadd);// guard against unphysical electron-core overlap
+			SmallRForce(delx,dely,delz,rc,fadd,&fx,&fy,&fz);
 			f[i][0] += fx;
 			f[i][1] += fy;
 			f[i][2] += fz;
@@ -282,8 +282,8 @@ void PairEffCut::compute(int eflag, int vflag)
 		  else{
 		  	Uec(2.0,qoe,rc,eradius[i],&ecoul,&fpair,&e1rforce,ac_e1,ac1_e1,ac2_e1,ac3_e1,ac4_e1,poe1,ac22_e1,ac33_e1,ac44_e1);
 			/*
-			harmonic(rc, 0.4, 10000, &eadd, &fadd);//避免外层电子和O核重叠
-			SmallRForce(delx,dely,delz,rc,fadd,&fx,&fy,&fz);//??
+			harmonic(rc, 0.4, 10000, &eadd, &fadd);// guard against unphysical electron-core overlap
+			SmallRForce(delx,dely,delz,rc,fadd,&fx,&fy,&fz);
 			f[i][0] += fx;
 			f[i][1] += fy;
 			f[i][2] += fz;
@@ -343,12 +343,12 @@ void PairEffCut::compute(int eflag, int vflag)
         fpair = fpair * spline - energy * dspline;
         energy = spline * energy;
 		
-		//eadd, fadd不用添加截断，因为只对近距离的原子对有效
+		// eadd/fadd are short-range guards and do not require the pair cutoff spline.
 		energy += eadd;
 
         // Tally cartesian forces
 		//utils::logmesg(lmp,"fpair = {:.8}\n",fpair);
-        SmallRForce(delx,dely,delz,rc,fpair,&fx,&fy,&fz);//??
+        SmallRForce(delx,dely,delz,rc,fpair,&fx,&fy,&fz);
         f[i][0] += fx;
         f[i][1] += fy;
         f[i][2] += fz;
@@ -608,8 +608,8 @@ void PairEffCut::allocate()
 
 void PairEffCut::settings(int narg, char **arg)
 {
-	if (narg < 1)
-	  error->all(FLERR,"Illegal pair_style command");
+	if (narg != 59)
+	  error->all(FLERR,"Pair style eff/cut requires exactly 59 numeric arguments");
   
 	cut_global=utils::numeric(FLERR,arg[0],false,lmp);
 	qoo=utils::numeric(FLERR,arg[1],false,lmp);

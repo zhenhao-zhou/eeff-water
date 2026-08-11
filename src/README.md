@@ -1,7 +1,9 @@
-# Source files
+# EeFF-water LAMMPS source files
 
-These files were copied from the uploaded modified `lammps/src` archive. See `MANIFEST.tsv` for classification and target installation paths.
+This directory contains the LAMMPS source files that were modified or added for EeFF-water. It is intentionally not a complete LAMMPS distribution.
 
-The repository intentionally does not include a complete LAMMPS distribution. The exact base release/commit is required. Files absent from this directory, such as unchanged headers, must come from that base version.
+Use these files with the base release recorded in `../lammps_patch/BASE_VERSION.txt`. Copy them into the corresponding LAMMPS `src/` directory before compilation. `MANIFEST.tsv` lists the target installation path and classifies each file as a modified upstream file or a new EeFF-water file.
 
-Before public release, remove unnecessary debug logging, review non-English comments, run formatting only if it does not obscure the patch, and test every file against a clean base tree.
+The source code in this release preserves the production model implementation. Repository cleanup was limited to documentation, comments, input-file consistency, and a strict argument-count check in `PairEffCut::settings()`; the fitted numerical parameter values and interaction formulas were not changed.
+
+Implementation-level fixed restraints and numerical guards are documented in `../IMPLEMENTATION_NOTES.md`.

@@ -1,23 +1,20 @@
-﻿# EeFF-water parameterization dataset
+# EeFF-water parameterization dataset
 
-This directory contains the energy and force reference data used to parameterize the EeFF water model.
+This directory contains the energy and nuclear-force reference data used to parameterize the EeFF-water model.
 
 ## Dataset composition
 
 The dataset contains 1,772 configurations:
 
-- 1,762 isolated molecular and ionic cluster configurations
-- 10 condensed-phase configurations containing 64 water molecules
+- distorted H2O monomers: 100
+- neutral water clusters, (H2O)n with n = 2-6: 462
+- protonated clusters containing one H3O+ defect: 300
+- deprotonated clusters containing one OH- defect: 300
+- clusters containing two H3O+ defects: 300
+- clusters containing two OH- defects: 300
+- ambient condensed-phase water configurations: 10
 
-The dataset includes:
-
-- distorted water monomers
-- neutral water clusters, (H2O)n with n = 2-6
-- protonated water clusters containing H3O+ defects
-- deprotonated water clusters containing OH- defects
-- clusters containing two hydronium defects
-- clusters containing two hydroxide defects
-- ambient liquid-water configurations
+The 1,762 isolated molecular/cluster configurations plus the 10 condensed-phase configurations give the total of 1,772.
 
 ## File organization
 
@@ -30,35 +27,34 @@ The corresponding reference energies and nuclear forces are stored in:
 - `energy.txt`
 - `force.txt`
 
-The entries in these files follow the indexed order of the corresponding `data.*` files.
+Entries follow the natural numeric order of the corresponding `data.*` index within each directory.
 
 ## Reference calculations
 
 Reference energies and nuclear forces for isolated molecular and ionic cluster configurations were calculated at the M06-2X/def2-TZVP level.
 
-The 10 condensed-phase liquid-water configurations were selected from a published dataset calculated at the revPBE0-D3 level.
+The 10 condensed-phase liquid-water configurations were selected from a published revPBE0-D3 water dataset.
 
-Energies were expressed relative to the lowest-energy configuration within each compositional class. Absolute energies obtained at the two electronic-structure levels were therefore not directly compared.
+Energies are expressed relative to the lowest-energy configuration within each compositional class. Absolute energies from the two electronic-structure data sources are therefore not directly mixed.
 
 ## Units
 
-- Energy: kcal mol-1
-- Nuclear force: kcal mol-1 Angstrom-1
+- energy: kcal mol-1
+- nuclear force: kcal mol-1 Angstrom-1
 
-Only forces acting on oxygen and hydrogen nuclei are included as reference force labels.
+Only forces acting on oxygen and hydrogen nuclei are included as reference labels.
 
 ## Electron-pair coordinates
 
-The electron-pair coordinates and wave-packet radii in the LAMMPS data files are initial values used for electronic energy minimization and are not quantum-mechanical reference labels.
+The electron-pair coordinates and wave-packet radii in the LAMMPS data files are initialization values for electronic minimization and are not quantum-mechanical reference labels.
 
-For each candidate EeFF parameter set, the nuclear coordinates were held fixed while the electron-pair coordinates and radii were optimized by energy minimization before evaluating the EeFF energy and nuclear forces.
+For each candidate EeFF parameter set, nuclear coordinates are held fixed while electron-pair center coordinates and radii are minimized before evaluating EeFF energies and nuclear forces.
 
 ## Training-domain scope
 
-Compressed liquid water and superionic water configurations were not included in the parameterization dataset. These conditions were reserved for evaluation of model transferability.
+Compressed liquid water and superionic water configurations are not included in the parameterization dataset. These conditions are reserved for transferability evaluation.
 
 ## Related files
 
-The final EeFF-water parameters are provided in `../parameters/`.
-
-The modified LAMMPS source files are provided in `../src/`.
+- final parameters: `../parameters/`
+- modified LAMMPS source: `../src/`

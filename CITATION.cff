@@ -1,11 +1,26 @@
-﻿cff-version: 1.2.0
+cff-version: 1.2.0
 message: "If you use this code or data, please cite the associated manuscript."
-title: "EeFF-water supplementary code and data"
+title: "EeFF-water: code, parameters and data"
+type: software
 authors:
   - family-names: "Zhou"
     given-names: "Zhenhao"
-# Add all manuscript authors before release.
-version: "0.1.0"
+  - family-names: "Li"
+    given-names: "Dongyuan"
+  - family-names: "Gang"
+    given-names: "Yue"
+  - family-names: "Zhang"
+    given-names: "Yuebin"
+  - family-names: "Fan"
+    given-names: "Hongjun"
+  - family-names: "Wang"
+    given-names: "Anhui"
+  - family-names: "Li"
+    given-names: "Guohui"
+version: "1.0.0"
 repository-code: "https://github.com/zhenhao-zhou/eeff-water"
-# doi: "10.xxxx/xxxxx"
-
+keywords:
+  - "explicit-electron force field"
+  - "reactive force field"
+  - "water"
+  - "LAMMPS"

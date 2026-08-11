@@ -1,28 +1,27 @@
 LAMMPS base version
 ===================
 
-Version reported by both supplied logs:
+Base release used for the archived EeFF-water source modifications:
     LAMMPS (2 Aug 2023 - Update 3)
 
-Exact Git commit:
-    Not yet identified.
+Upstream source identifier:
+    The exact upstream Git commit was not retained in the archived build metadata.
+    Use the official 2 Aug 2023 - Update 3 source release as the base tree.
 
-Build system:
-    Legacy make workflow was used in the original work.
+Recorded build environment:
+    Operating system: KOS 5.8
+    GCC/G++: 8.5.0
+    OpenMPI: 4.1.6
+    Build system: legacy LAMMPS make workflow
 
-Minimum packages for the included run-0 examples:
+Packages required by the representative examples:
     EFF
     MOLECULE
+    EXTRA-FIX   (for fix temp/csvr)
 
-Additional package used by the supplied bcc production input:
-    EXTRA-FIX  (for fix temp/csvr)
+Additional packages that were enabled in the original production build:
+    EXTRA-DUMP, KSPACE, MANYBODY, REAXFF, RIGID
 
-Packages enabled in the original paper build according to package-status:
-    EFF, EXTRA-DUMP, EXTRA-FIX, KSPACE, MANYBODY, MOLECULE,
-    REAXFF, RIGID
-
-TODO before a stable paper release:
-    1. Identify the exact upstream Git commit corresponding to the
-       2 Aug 2023 - Update 3 release.
-    2. Record compiler, MPI implementation, machine makefile and flags.
-    3. Generate and test eeff_water.patch against a clean upstream tree.
+The files in ../src/ are intended to replace files with the same names in a clean
+LAMMPS 2 Aug 2023 - Update 3 source tree. Files not included in ../src/ must be
+taken unchanged from that base release.

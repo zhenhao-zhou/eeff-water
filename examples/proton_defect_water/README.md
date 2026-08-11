@@ -1,26 +1,26 @@
-# Proton-defect water example
+# Proton-defect water examples
 
-This folder contains representative EeFF-water inputs for ambient proton-defect water.
+This directory contains separate runnable EeFF-water inputs for hydronium and hydroxide defects at 300 K and 1 atm.
 
 ## Files
 
-* `data.511h2o\\\_1h3o`: initial configuration for 511 H2O + 1 H3O+.
-* `data.511h2o\\\_1oh`: initial configuration for 511 H2O + 1 OH-.
-* `in.defect`: LAMMPS input file.
+- `data.511h2o_1h3o`: 511 H2O + 1 H3O+ initial configuration.
+- `data.511h2o_1oh`: 511 H2O + 1 OH- initial configuration.
+- `in.h3o`: hydronium-defect input.
+- `in.oh`: hydroxide-defect input.
 
 ## Run
 
-Run from this directory with:
+Hydronium:
 
 ```bash
-/path/to/lmp -in in.defect
+/path/to/lmp -in in.h3o
 ```
 
-The input reads the final EeFF-water parameters from `../../parameters/eeff\\\_water\\\_pair\\\_style.inc`.
+Hydroxide:
 
-## Notes
+```bash
+/path/to/lmp -in in.oh
+```
 
-This example is provided as a representative input file for proton-defect water simulations.
-
-
-
+Both inputs use a 0.2 fs time step and a 5,000,000-step production segment, corresponding to 1 ns.

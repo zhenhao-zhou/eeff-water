@@ -63,7 +63,7 @@ void ComputeTempEff::setup()
 }
 
 /* ---------------------------------------------------------------------- */
-//计算自由度
+// Compute the relevant degrees of freedom.
 void ComputeTempEff::dof_compute()
 {
   adjust_dof_fix();
@@ -115,12 +115,12 @@ double ComputeTempEff::compute_scalar()
   if (mass) {
     for (int i = 0; i < nlocal; i++) {
       if (mask[i] & groupbit) {
-		  t += (v[i][0]*v[i][0] + v[i][1]*v[i][1] + v[i][2]*v[i][2]) * mass[type[i]];//计算所有电子的平动动能
+		  t += (v[i][0]*v[i][0] + v[i][1]*v[i][1] + v[i][2]*v[i][2]) * mass[type[i]];// translational kinetic contribution of all electron particles
         //if (abs(spin[i])==1 || abs(spin[i])==2) t += mefactor*mass[type[i]]*ervel[i]*ervel[i];
       }
     }
   }
-//MPI_SUM将所有进程的t相加并返回scalar。
+// MPI_SUM accumulates t across ranks and returns the global scalar.
   MPI_Allreduce(&t,&scalar,1,MPI_DOUBLE,MPI_SUM,world);
   if (dynamic) dof_compute();
   //fprintf(universe->uscreen,"dof:%d %d\n",universe->me, dof);

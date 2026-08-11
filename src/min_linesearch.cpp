@@ -172,7 +172,7 @@ void MinLineSearch::reset_vectors()
    uses no gradient info, but should be very robust
    start at maxdist, backtrack until energy decrease is sufficient
 ------------------------------------------------------------------------- */
-//调用之前系统的能量值，以及给定初始的alpha
+// Use the current system energy and the supplied initial alpha.
 int MinLineSearch::linemin_backtrack(double eoriginal, double &alpha)
 {
   int i,m,n;
@@ -182,12 +182,12 @@ int MinLineSearch::linemin_backtrack(double eoriginal, double &alpha)
 
   // fdothall = projection of search dir along downhill gradient
   // if search direction is not downhill, exit with error
-  // 1. 计算搜索方向在全局梯度上的投影（判定是否沿负梯度方向）
+  // 1. Project the search direction onto the global gradient.
   fdothme = 0.0;
   int me;
   MPI_Comm_rank(world, &me);
-  //原子坐标自由度数目*3（即系统的位移自由度维度）
-  //h 通常表示当前位置沿某个方向进行线性搜索的方向。h[i] 是提前由最小化方法（如 cg, sd, fire 等）计算好的
+  // Three Cartesian degrees of freedom per atomic coordinate.
+  // h is the line-search direction supplied by the minimization method.
   for (i = 0; i < nvec; i++) {
 	  //utils::logmesg(lmp, "me,i,fvec[i], h[i] = {:d},{:d},{:.12f}, {:.12f}\n",me,i,fvec[i], h[i]);
 	  fdothme += fvec[i]*h[i];
@@ -218,7 +218,7 @@ int MinLineSearch::linemin_backtrack(double eoriginal, double &alpha)
   // also ensure alpha <= ALPHA_MAX
   // else will have to backtrack from huge value when forces are tiny
   // if all search dir components are already 0.0, exit with error
-  // 2. 根据最大位移约束和各类自由度，给出初始步长 alpha
+  // 2. Choose the initial alpha subject to the maximum displacement constraint.
   hme = 0.0;
   for (i = 0; i < nvec; i++) hme = MAX(hme,fabs(h[i]));
   MPI_Allreduce(&hme,&hmaxall,1,MPI_DOUBLE,MPI_MAX,world);
