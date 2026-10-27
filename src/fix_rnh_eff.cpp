@@ -111,9 +111,5 @@ void FixRNHEff::nh_v_temp()
     if (mask[i] & groupbit)
       if (abs(spin[i])>=1) {
 		  ervel[i] *= factor_eta;
-		  if(ervel[i] > 0.05)
-			  ervel[i] = 0.05;
-		  if(ervel[i] < -0.05)
-			  ervel[i] = -0.05;
 	  }
 }
